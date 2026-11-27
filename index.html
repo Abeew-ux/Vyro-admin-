@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VYRO Admin</title>
+<style>
+:root{--bg:#12061f;--c1:#291552;--c2:#1c0f3d;--line:#4a2f8a;--txt:#fff;--mut:#a894d6;--pink:#ff7eb6;--mag:#e040fb;--red:#ff6b8a;--ok:#3ddc97}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(84px + env(safe-area-inset-bottom,0px))}
+svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+h1{font-size:2.1rem;font-weight:800;margin:0;letter-spacing:-.5px}
+h2{font-size:1.45rem;font-weight:700;margin:26px 0 12px}
+.round{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:#2a1856;color:#c79bff;font-size:1.25rem;display:grid;place-items:center;cursor:pointer}
+.card{background:linear-gradient(160deg,var(--c1),var(--c2));border:1.5px solid var(--line);border-radius:20px;padding:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{text-align:center;padding:16px 6px 12px}
+.stat .ic{height:44px;display:grid;place-items:center;color:var(--mag);font-size:2.3rem}
+.stat .dot{width:24px;height:24px;border-radius:50%;background:#35e06b;box-shadow:0 0 18px 6px rgba(53,224,107,.45),0 0 24px 8px rgba(255,80,160,.3)}
+.stat .l{color:var(--mut);font-size:.82rem;margin-top:6px}
+.stat .n{font-size:2.3rem;font-weight:800;line-height:1.15}
+.stat .d{color:var(--pink);font-weight:700;font-size:.78rem}
+.chart{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;height:240px;padding:0 4px;border-bottom:1.5px solid #4a3a7a}
+.bar{flex:1;border-radius:12px 12px 0 0;background:#e040fb;min-height:6px}
+.bar.cur{background:repeating-linear-gradient(0deg,transparent 0 11px,rgba(255,126,182,.35) 11px 12px),repeating-linear-gradient(90deg,transparent 0 11px,rgba(255,126,182,.35) 11px 12px);border:2px solid var(--pink);border-bottom:0}
+.labels{display:flex;justify-content:space-between;gap:8px;padding:8px 4px 2px;color:#c9b8f0;font-size:.95rem}
+.labels span{flex:1;text-align:center}
+.note{color:var(--mut);font-size:.78rem;margin-top:10px}
+.prev{border-radius:16px;overflow:hidden;background:#0b0418;margin:2px auto 0;width:calc(100% - 20px);border:2px solid #5b3fa8;touch-action:none}
+.prev.cadre{width:min(260px,100%);aspect-ratio:1;background:radial-gradient(circle,#6a35b0 0 29.8%,#1d1238 30%)}.prev.cadre .ph{padding:0;height:100%;display:grid;place-items:center;font-size:.85rem}
+.prev img,.prev canvas{display:block;width:100%;height:auto}
+.prev.bandeau img,.prev.bandeau canvas{aspect-ratio:1260/540;object-fit:cover}
+.ph{padding:40px 10px;text-align:center;color:var(--mut)}
+.cap{text-align:center;color:#c9b8f0;font-size:1rem;margin:10px 0 14px;word-break:break-word}
+.btns{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 8px;min-height:36px;line-height:1.15;text-align:center;border-radius:10px;border:1.5px solid #c9a0ff;background:transparent;color:#e7d6ff;font-weight:700;font-size:.76rem;cursor:pointer;font-family:inherit}
+.btn.main{background:var(--mag);border-color:var(--mag);color:#fff}
+.btn.del{border-color:#a24a6a;color:var(--red)}
+.btn.sm{min-height:0;padding:5px 8px;font-size:.7rem;border-radius:8px;width:auto}
+.btn:disabled{opacity:.4}
+.fields{margin-bottom:12px}
+label{display:block;color:var(--mut);font-size:.82rem;margin:10px 0 4px}
+input[type=text],input[type=number],input[type=search],input[type=email],input[type=password]{width:100%;padding:13px;border-radius:12px;border:1.5px solid var(--line);background:#150a2c;color:#fff;font-size:1rem;font-family:inherit}
+input[type=range]{width:100%;accent-color:var(--mag)}
+:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{background:#150a2c;border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+.item .im{background:#0b0418}
+.item.cadre .im{display:flex;justify-content:center;padding:12px;background:#0b0418}
+.item img{display:block;width:100%}
+.item.bandeau img{aspect-ratio:840/360;object-fit:cover}
+.item.cadre img{width:100px;height:100px;background:radial-gradient(circle,#6a35b0 0 29.8%,transparent 30%)}
+.item .t{padding:8px 10px;font-size:.85rem}.item .t span{color:var(--pink);font-weight:700}
+.item .a{display:flex;flex-wrap:wrap;gap:4px;padding:0 6px 8px}
+.off .im,.off .t{opacity:.45}
+.seg{position:fixed;left:0;right:0;bottom:calc(54px + env(safe-area-inset-bottom,0px));padding:6px 16px;background:linear-gradient(transparent,var(--bg) 30%);z-index:6}
+.seg div{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.seg button{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:10px;border:0;background:#1d1040;color:#c9b8f0;font-size:.8rem;font-weight:700;font-family:inherit;cursor:pointer}
+.seg button.on{background:#f0709f;color:#fff}
+nav{position:fixed;left:0;right:0;bottom:0;background:#170a30;border-top:1px solid #2f1c5c;z-index:7;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav div{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+nav button{background:none;border:0;color:#a37fd9;padding:6px 2px 8px;font-size:.68rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-family:inherit}
+nav button .i{font-size:1.3rem}
+nav button.on{color:#ff8fc3}
+.msg{font-size:.85rem;min-height:1.2em;margin-top:8px;text-align:center}
+.ok{color:var(--ok)}.err{color:var(--red)}
+.urow{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:8px}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,#a63fd1,#3db9a0);flex:none}
+.urow b{display:block}.urow small{color:var(--mut)}
+.urow .sp{flex:1;min-width:0}
+.search{display:flex;align-items:center;gap:10px;padding:0 16px;border:1.5px solid var(--line);border-radius:999px;background:linear-gradient(160deg,var(--c1),var(--c2));margin-bottom:14px;color:#c79bff;font-size:1.35rem}.search:focus-within{border-color:var(--pink)}.search input[type=search]{border:0;background:transparent;padding:14px 0;font-size:1rem;outline:0;color:#fff;width:100%;border-radius:0}
+#set{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 18px) 16px 40px}
+#set>div{max-width:520px;margin:0 auto}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pvs{display:grid;gap:8px;margin:12px 0}.pvs small{color:var(--mut);font-size:.75rem}.pvb{background:#0b0418 center/cover no-repeat;border-radius:12px;border:1px solid var(--line)}.chk{display:flex;align-items:center;gap:8px;font-size:.85rem;color:#c9b8f0;margin:12px 0 4px}.chk input{width:20px;height:20px;accent-color:var(--mag)}
+.pkpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:300px;overflow:auto;margin-bottom:6px}
+.pk{position:relative;padding:0;border:2px solid var(--line);border-radius:12px;overflow:hidden;background:#150a2c;color:#fff;cursor:pointer;font-family:inherit}
+.pk img{display:block;width:100%;aspect-ratio:840/360;object-fit:cover}
+.pk b{display:block;font-size:.66rem;padding:4px 6px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pk.on{border-color:var(--pink)}
+
+.pkc{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:2px;aspect-ratio:840/360;background:#0b0418}
+.pkc img{width:100%;height:100%;object-fit:cover;aspect-ratio:auto}
+.mut{color:var(--mut)}
+.r2b{display:flex;gap:8px;margin-top:12px}
+.r2b .btn{flex:1}
+.pk{text-align:left}
+.ck{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.5);display:grid;place-items:center;font-style:normal;font-size:.85rem;font-weight:800;color:#12061f;cursor:pointer}
+.pk.on .ck{background:var(--pink);border-color:var(--pink)}.pk.on .ck::after{content:"✓"}
+#mdl{position:fixed;inset:0;background:rgba(8,2,16,.88);z-index:30;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px 30px}
+#mdl .mbox{max-width:520px;margin:0 auto;position:relative}
+#mx{position:absolute;right:0;top:0;width:36px;height:36px;font-size:1.3rem}
+#mbody small{display:block;margin:10px 0 4px}
+.pvt{font-size:1.2rem;font-weight:800;margin:0 46px 8px 0}.pvp{color:var(--pink);font-weight:700;margin:10px 0}
+.hm{position:relative;container-type:inline-size;aspect-ratio:437/229;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#0b0418}
+.hmi{position:absolute;inset:0;--u:calc(100cqw/437)}
+.hmi>*{position:absolute;margin:0}
+.hmbg{inset:0;background:#0b0418 center/cover no-repeat}
+.hmov{inset:0;background:linear-gradient(90deg,rgba(6,2,16,.62) 0%,rgba(6,2,16,.22) 55%,transparent 82%)}
+.hml{left:calc(var(--u)*14);top:calc(var(--u)*30);font-size:calc(var(--u)*34);font-weight:900;color:#c084fc;text-shadow:0 0 10px #a855f7;line-height:1;letter-spacing:1px}
+.hmt{left:calc(var(--u)*24);top:calc(var(--u)*68);font-size:calc(var(--u)*11);color:#d8b4fe;font-weight:600;white-space:nowrap}
+.hmc{width:calc(var(--u)*40);height:calc(var(--u)*40);top:calc(var(--u)*45);border-radius:50%;background:rgba(12,4,30,.6);border:1px solid rgba(168,85,247,.6)}
+.hmav{left:calc(var(--u)*14);top:calc(var(--u)*108);width:calc(var(--u)*80);height:calc(var(--u)*80);border-radius:50%;border:calc(var(--u)*4) solid #a855f7;background:radial-gradient(circle at 30% 25%,#8b5cf6,#2a0a5e);box-shadow:0 0 calc(var(--u)*20) rgba(168,85,247,.8)}
+.hmn{left:calc(var(--u)*104);top:calc(var(--u)*110);font-size:calc(var(--u)*24);font-weight:800;color:#fff;line-height:1.05;white-space:nowrap}
+.hmh{left:calc(var(--u)*104);top:calc(var(--u)*138);font-size:calc(var(--u)*13);color:#c4a1ff;white-space:nowrap}
+.hmd{top:calc(var(--u)*158);width:calc(var(--u)*34);height:calc(var(--u)*34);border-radius:50%;background:rgba(12,4,30,.7);border:1px solid rgba(168,85,247,.65)}
+.hmsh{right:calc(var(--u)*14);top:calc(var(--u)*128);padding:calc(var(--u)*9) calc(var(--u)*12);border-radius:calc(var(--u)*22);background:rgba(12,4,30,.66);border:1px solid rgba(168,85,247,.65);color:#fff;font-weight:700;font-size:calc(var(--u)*15)}
+.hmfb{left:calc(var(--u)*10);right:calc(var(--u)*10);top:calc(var(--u)*192);height:calc(var(--u)*55);border-radius:calc(var(--u)*22);background:linear-gradient(180deg,rgba(34,14,70,.92),rgba(14,5,32,.94));border:1px solid rgba(168,85,247,.6)}
+.rw{position:relative;container-type:inline-size;aspect-ratio:1020/200;border-radius:22px;overflow:hidden;border:1px solid #e3d4fb;background:#fff}
+.rwi{position:absolute;inset:0;--u:calc(100cqw/1020)}
+.rwi>*{position:absolute;margin:0}
+.rwbg{inset:0;background:#fff center/cover no-repeat}
+.rwov{inset:0;background:linear-gradient(90deg,rgba(255,255,255,.96) 0%,rgba(255,255,255,.9) 38%,rgba(255,255,255,.3) 72%,rgba(255,255,255,0) 100%)}
+.rwav{left:calc(var(--u)*32);top:calc(var(--u)*13);width:calc(var(--u)*170);height:calc(var(--u)*170);border-radius:50%;border:calc(var(--u)*6) solid #dcdbe3;background:linear-gradient(135deg,#8a8a94,#2a2a30)}
+.rwmo{left:calc(var(--u)*145);top:calc(var(--u)*125);width:calc(var(--u)*62);height:calc(var(--u)*62);border-radius:50%;background:#fff;border:1px solid #e3d4fb;display:grid;place-items:center;color:#a78bfa;font-style:normal;font-size:calc(var(--u)*34)}
+.rwn{left:calc(var(--u)*245);top:calc(var(--u)*46);font-size:calc(var(--u)*46);font-weight:800;color:#1b1b1f;line-height:1.1;white-space:nowrap}
+.rwm{left:calc(var(--u)*245);top:calc(var(--u)*118);font-size:calc(var(--u)*40);color:#6b6b78;white-space:nowrap}
+.rwd{right:calc(var(--u)*40);top:calc(var(--u)*52);font-size:calc(var(--u)*34);color:#4b4b58;text-shadow:0 0 calc(var(--u)*10) #fff,0 0 calc(var(--u)*4) #fff}
+.rwc{left:calc(var(--u)*700);top:calc(var(--u)*62);width:calc(var(--u)*180);height:calc(var(--u)*96);border-radius:50%;border:calc(var(--u)*4) solid rgba(167,139,250,.45)}
+#login{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;place-items:center;padding:20px}
+body.lock #login{display:grid}body.lock #app,body.lock nav,body.lock #set,body.lock #mdl{display:none!important}
+.lbox{width:100%;max-width:380px}.lbox h1{margin-bottom:6px}.lbox p{margin:0 0 14px;color:var(--mut)}
+.dot2{display:inline-block;width:9px;height:9px;border-radius:50%;background:#35e06b;box-shadow:0 0 8px #35e06b;margin-left:6px}
+.pill{font-size:.7rem;color:var(--mut);white-space:nowrap}
+[hidden]{display:none!important}
+</style>
+</head>
+<body class="lock">
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.8 0 4.5 1.8 4.5 4.5"/></symbol>
+<symbol id="usersf" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.6" fill="currentColor"/><path d="M2 20.5c0-4 3-6.5 7-6.5s7 2.5 7 6.5z" fill="currentColor"/><circle cx="17.5" cy="9" r="2.7" fill="currentColor"/><path d="M16.5 14c3.2 0 5 1.8 5 5v1.5h-4" fill="currentColor"/></symbol>
+<symbol id="grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3" fill="currentColor" stroke="none"/><path d="M8 2.5v4M16 2.5v4M3 10h18" stroke="#1c0f3d" stroke-width="1.6"/><path d="M8 14h1.5M11.3 14h1.5M14.6 14h1.5M8 17.5h1.5M11.3 17.5h1.5M14.6 17.5h1.5" stroke="#1c0f3d" stroke-width="2"/></symbol>
+<symbol id="img" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.7"/><path d="M4 18l5-5 4 4 3-3 4 4"/></symbol>
+<symbol id="trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+<symbol id="frame" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M3 7h2M3 17h2M19 7h2M19 17h2"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+</defs></svg>
+
+<div id="login"><div class="lbox"><h1>VYRO Admin</h1><p>Connecte-toi avec ton compte VYRO administrateur.</p>
+  <form id="lf" autocomplete="on"><label for="lem">Email</label><input type="email" id="lem" autocomplete="username" required>
+  <label for="lpw">Mot de passe</label><input type="password" id="lpw" autocomplete="current-password" required>
+  <button class="btn main" style="width:100%;margin-top:16px;min-height:46px;font-size:.95rem">Se connecter</button><div class="msg err" id="lmsg" role="status"></div></form></div></div>
+
+<div id="app">
+  <div class="top"><h1>VYRO Admin</h1><button class="round" id="gbtn" aria-label="Paramètres"><svg class="i"><use href="#gear"/></svg></button></div>
+
+  <!-- Tableau de bord -->
+  <section id="p-dash">
+    <div class="stats" id="stats"></div>
+    <h2 style="margin-top:34px">Utilisateurs par mois</h2>
+    <div class="card"><div class="chart" id="chart"></div><div class="labels" id="labels"></div></div>
+    <div class="note" id="dnote">Chiffres en direct depuis la base VYRO.</div>
+  </section>
+
+  <!-- Utilisateurs -->
+  <section id="p-users" hidden>
+    <div class="search"><svg class="i"><use href="#search"/></svg><input type="search" id="uq" placeholder="Rechercher" maxlength="30" autocomplete="off" aria-label="Rechercher un utilisateur"></div>
+    <div id="ulist"></div>
+  </section>
+
+  <!-- Contenu -->
+  <section id="p-content" hidden>
+    <h2 style="margin-top:6px" id="ctitle">Gérer l’image du bandeau</h2>
+    <div class="card" id="mgr">
+      <div class="prev bandeau" id="prev"></div>
+      <div class="cap" id="cap"></div>
+      <div class="note" id="hintFmt" style="text-align:center;margin:-6px 0 14px"></div>
+      <div id="ctrl" hidden class="fields">
+        <label for="zoom" style="margin-top:0">Zoom (glisse l’image pour la placer)</label>
+        <input type="range" id="zoom" min="1" max="3" step="0.01" value="1">
+        <div id="pvB" class="pvs"><div><small>Aperçu accueil (en-tête avec ton profil)</small><div id="hmHost"></div><div class="note">Garde le sujet à droite : le logo, la photo et le nom couvrent la gauche.</div></div><div><small>Aperçu liste de discussions</small><div id="rwHost"></div><div class="note">Seule une bande horizontale du bandeau est visible, et le fond blanc à gauche couvre la photo et le nom : place le sujet au centre, vers la droite.</div></div><div><small>Aperçu boutique</small><div class="pvb" id="pv1" style="aspect-ratio:840/360"></div></div><div><small>Aperçu profil</small><div class="pvb" id="pv2" style="aspect-ratio:480/170"></div></div><div><small>Aperçu discussion</small><div class="pvb" id="pv3" style="aspect-ratio:480/166"></div></div></div>
+        <label class="chk" id="punchL" hidden><input type="checkbox" id="punch" checked> Vider le centre pour la photo de profil</label>
+        <label for="name">Nom</label>
+        <input type="text" id="name" maxlength="40">
+        <label for="price">Prix (BeeCoins) — 0 pour gratuit</label>
+        <input type="number" id="price" min="0" step="50" value="500" inputmode="numeric">
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+      <div class="btns">
+        <button class="btn" id="choose"><svg class="i"><use href="#img"/></svg><span id="chooseT">Choisir un bandeau</span></button>
+        <button class="btn main" id="save" disabled>Enregistrer</button>
+        <button class="btn del" id="rm"><svg class="i"><use href="#trash"/></svg>Supprimer</button>
+      </div>
+      <div class="msg" id="msg" role="status"></div>
+    </div>
+    <div id="lst"><h2 style="font-size:1.15rem"><span id="ltitle">Bandeaux</span> (<span id="count">0</span>)</h2>
+    <div class="grid" id="list"></div></div>
+    </section>
+</div>
+
+
+
+<nav><div id="nav">
+  <button data-p="dash" class="on"><svg class="i"><use href="#home"/></svg>Tableau de bord</button>
+  <button data-p="users"><svg class="i"><use href="#users"/></svg>Utilisateurs</button>
+  <button data-p="content"><svg class="i"><use href="#grid"/></svg>Contenu</button>
+</div></nav>
+
+<!-- Paramètres -->
+<div id="mdl" hidden><div class="mbox"><button type="button" class="round" id="mx" aria-label="Fermer">×</button><div id="mbody"></div></div></div>
+
+<div id="set" hidden><div>
+  <div class="top"><h1>Paramètres</h1><button class="round" id="sback" aria-label="Retour"><svg class="i"><use href="#back"/></svg></button></div>
+  <div class="card">
+    <h2 style="margin-top:0;font-size:1.1rem">Compte administrateur</h2>
+    <div class="note" style="margin:0 0 12px" id="acct"></div>
+    <div class="r2"><button class="btn" id="refresh">Actualiser</button><button class="btn del" id="logout">Se déconnecter</button></div>
+    <div class="msg" id="smsg" role="status"></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin-top:0;font-size:1.1rem">Boutique</h2>
+    <div class="note" style="margin:0">Les bandeaux que tu enregistres vont directement dans la boutique de l’appli, avec leur prix en BeeCoins. « Masquer » les retire de la boutique ; les dessins intégrés à l’appli ne peuvent être que masqués.</div>
+  </div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const CFG={
+  bandeau:{w:1260,h:540,mime:'image/jpeg',fmt:'JPEG',ext:'jpg',q:.85,one:'bandeau',many:'Bandeaux',title:'Gérer l’image du bandeau',choose:'Choisir un bandeau',hint:'Format de l’appli : 1260 × 540 (7:3). Garde le sujet au centre : sur le profil et en discussion, le haut et le bas sont coupés.'},
+  cadre:{w:512,h:512,mime:'image/webp',fmt:'WEBP',ext:'webp',q:.92,one:'cadre',many:'Cadres',title:'Gérer le cadre de profil',choose:'Choisir un cadre',hint:'Carré 512 × 512 transparent. Il entoure la photo de profil : le centre (≈ 60 %) doit rester vide.'}
+};
+const SB_URL='https://cetbspgxsqbaousqrara.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldGJzcGd4c3FiYW91c3FyYXJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MjI4MjUsImV4cCI6MjEwNjA5ODgyNX0._I_3CBRQMlFGalyRY4_Ne7TsKbj3F-nOdsI2HBEWrqk';
+const sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'vyro-admin-auth'}});
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function say(id,t,bad){const m=$(id);m.textContent=t;m.className='msg '+(t?(bad?'err':'ok'):'')}
+function num(n){return Number(n).toLocaleString('fr-FR').replace(/\u202f|\u00a0/g,'')}
+
+let all=[],stats={online:0,day:0,total:0,week:0,month:0,pct:0,hist:[0,0,0,0,0,0]},users=[],admin=null;
+let page='dash',type='bandeau',img=null,fname='',zoom=1,px=0,py=0,raf=0;
+const cv=document.createElement('canvas'),ctx=cv.getContext('2d');
+
+/* ---------- Navigation ---------- */
+$('nav').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.p)};
+function go(p){
+  page=p;
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  ['dash','users','content'].forEach(x=>$('p-'+x).hidden=x!==p);
+  scrollTo(0,0);
+  if(p==='dash'){renderDash();loadStats()}if(p==='users'){renderUsers();loadUsers()}if(p==='content'){setType(type);loadBanners()}
+}
+$('gbtn').onclick=()=>{$('acct').textContent='Connecté : '+(admin&&admin.email||'');say('smsg','');$('set').hidden=false};
+$('sback').onclick=()=>{$('set').hidden=true};
+function emsg(e){const m=String(e&&e.message||e||'');
+  if(/not_admin/.test(m))return 'Ce compte n’a pas les droits administrateur.';
+  if(/img_required/.test(m))return 'Image manquante.';
+  if(/bad_price/.test(m))return 'Prix invalide.';
+  if(/bad_name/.test(m))return 'Nom invalide (1 à 40 caractères).';
+  if(/Failed to fetch|NetworkError|network/i.test(m))return 'Pas de connexion à internet.';
+  if(/exceeded|too large|size/i.test(m))return 'Image trop lourde (2 Mo maximum).';
+  return 'Erreur : '+m}
+async function loadStats(){
+  const {data,error}=await sb.rpc('vyro_admin_stats');
+  if(error){$('dnote').textContent=emsg(error);$('dnote').className='note err';return}
+  stats=Object.assign({},stats,data,{pct:Number(data.pct)||0,hist:(data.hist||[]).map(Number)});
+  $('dnote').textContent='Chiffres en direct depuis la base VYRO · mis à jour '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});$('dnote').className='note';
+  renderDash();
+}
+setInterval(()=>{if(admin&&page==='dash'&&!document.hidden)loadStats()},30000);
+
+/* ---------- Tableau de bord ---------- */
+function renderDash(){
+  $('stats').innerHTML=
+   '<div class="card stat"><div class="ic"><div class="dot"></div></div><div class="l">En ligne</div><div class="n">'+num(stats.online)+'</div><div class="d">+'+num(stats.day)+' aujourd’hui</div></div>'+
+   '<div class="card stat"><div class="ic"><svg class="i" style="stroke:none"><use href="#usersf"/></svg></div><div class="l">Total utilisateurs</div><div class="n">'+num(stats.total)+'</div><div class="d">+'+num(stats.week)+' cette semaine</div></div>'+
+   '<div class="card stat"><div class="ic"><svg class="i" style="stroke:none"><use href="#cal"/></svg></div><div class="l">Ce mois</div><div class="n">'+num(stats.month)+'</div><div class="d">'+(stats.pct>=0?'+':'')+String(stats.pct).replace('.',',')+'%</div></div>';
+  const vals=stats.hist.concat([stats.month]),max=Math.max.apply(null,vals)*1.12||1,now=new Date();
+  $('chart').innerHTML=vals.map((v,i)=>'<div class="bar'+(i===6?' cur':'')+'" style="height:'+Math.max(3,v/max*100)+'%" title="'+v+'"></div>').join('');
+  $('labels').innerHTML=vals.map((v,i)=>{
+    let l=new Date(now.getFullYear(),now.getMonth()-(6-i),1).toLocaleDateString('fr-FR',{month:'short'}).replace('.','');
+    return '<span>'+l[0].toUpperCase()+l.slice(1)+'</span>'}).join('');
+}
+
+/* ---------- Utilisateurs ---------- */
+function renderUsers(){
+  const dt=d=>d?new Date(d).toLocaleDateString('fr-FR'):'';
+  $('ulist').innerHTML=users.length?users.map(u=>{const n=u.display_name||u.username||'?';
+   return '<div class="card urow"><div class="av">'+esc(n[0].toUpperCase())+'</div><div class="sp"><b>'+esc(n)+(u.online?'<i class="dot2" title="En ligne"></i>':'')+'</b><small>@'+esc(u.username||'')+' · inscrit le '+dt(u.created_at)+'</small></div></div>'}).join('')
+   :'<div class="note" style="text-align:center">'+($('uq').value.trim()?'Aucun résultat.':'Aucun utilisateur.')+'</div>';
+}
+let uT=0;
+async function loadUsers(){
+  const {data,error}=await sb.rpc('vyro_admin_users',{p_q:$('uq').value.trim(),p_limit:300});
+  if(error){$('ulist').innerHTML='<div class="note err" style="text-align:center">'+esc(emsg(error))+'</div>';return}
+  users=data||[];renderUsers();
+}
+$('uq').oninput=()=>{clearTimeout(uT);uT=setTimeout(loadUsers,250)};
+/* ---------- Maquette de l'en-tête d'accueil ---------- */
+function homeMock(url){
+  return '<div class="hm"><div class="hmi"><div class="hmbg" style="background-image:url('+url+')"></div><div class="hmov"></div>'+
+   '<b class="hml">VYRO</b><span class="hmt">Connect • Chat • Share ♡</span>'+
+   '<i class="hmc" style="right:calc(var(--u)*11)"></i><i class="hmc" style="right:calc(var(--u)*59)"></i><i class="hmc" style="right:calc(var(--u)*107)"></i>'+
+   '<i class="hmav"></i><b class="hmn">Abee ⌄</b><span class="hmh">@abdramane</span>'+
+   '<i class="hmd" style="left:calc(var(--u)*104)"></i><i class="hmd" style="left:calc(var(--u)*144)"></i><i class="hmd" style="left:calc(var(--u)*184)"></i>'+
+   '<span class="hmsh">Boutique ›</span><i class="hmfb"></i></div></div>';
+}
+
+function rowMock(url){
+  return '<div class="rw"><div class="rwi"><div class="rwbg" style="background-image:url('+url+')"></div><div class="rwov"></div>'+
+   '<i class="rwav"></i><i class="rwmo">☾</i><b class="rwn">SAOUD</b><span class="rwm">🎮 Morpion</span><span class="rwd">25/11</span><i class="rwc"></i></div></div>';
+}
+
+/* ---------- Aperçu d'un bandeau ---------- */
+function modal(h){$('mbody').innerHTML=h;$('mdl').hidden=false;$('mdl').scrollTop=0}
+$('mx').onclick=()=>{$('mdl').hidden=true};
+$('mdl').onclick=e=>{if(e.target.id==='mdl')$('mdl').hidden=true};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('mdl').hidden=true});
+function openBn(id){
+  const b=all.find(x=>x.id===id);if(!b||!b.image)return;
+  modal('<div class="pvt">'+esc(b.name)+'</div><small class="mut">Sur l’accueil</small>'+homeMock(b.image)+'<div class="note">Garde le sujet à droite : le logo, la photo et le nom couvrent la gauche.</div><small class="mut">Dans la liste des discussions</small>'+rowMock(b.image)+'<div class="note">Seule une bande horizontale est visible : sujet au centre, vers la droite.</div><small class="mut">Dans la boutique</small><div class="pvb" style="aspect-ratio:840/360;background-image:url('+b.image+')"></div><small class="mut">Sur un profil</small><div class="pvb" style="aspect-ratio:480/170;background-image:url('+b.image+')"></div><div class="pvp">'+(b.price>0?num(b.price)+' BeeCoins':'Gratuit')+'</div>');
+}
+
+/* ---------- Contenu ---------- */
+function setType(t){
+  type=t;
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  const c=CFG[t];
+  $('ctitle').textContent=c.title;$('chooseT').textContent=c.choose;$('hintFmt').textContent=c.hint;$('punchL').hidden=t!=='cadre';$('pvB').hidden=t!=='bandeau';$('ltitle').textContent=c.many;
+  cv.width=c.w;cv.height=c.h;discard();renderList();
+}
+function current(){return all.find(b=>b.type===type&&b.image)}
+function discard(){
+  img=null;fname='';$('file').value='';$('ctrl').hidden=true;$('save').disabled=true;$('name').value='';say('msg','');showPrev();
+}
+function showPrev(){
+  const p=$('prev'),cur=current(),c=CFG[type];p.className='prev '+type;
+  if(img){p.innerHTML='';p.appendChild(cv);
+    $('cap').textContent=fname+' • '+c.w+'×'+c.h+' • '+c.fmt;return}
+  if(cur&&cur.image){p.innerHTML='<img src="'+esc(cur.image)+'" alt="'+esc(cur.name)+'">';
+    $('cap').textContent=cur.name+' • '+(cur.price>0?num(cur.price)+' BeeCoins':'Gratuit')+(cur.active?'':' • masqué');return}
+  p.innerHTML='<div class="ph">Aucune image pour l’instant</div>';$('cap').textContent='';
+}
+function base(){return Math.max(cv.width/img.width,cv.height/img.height)}
+function draw(){
+  if(!img)return;
+  const s=base()*zoom;
+  px=Math.min(0,Math.max(cv.width-img.width*s,px));py=Math.min(0,Math.max(cv.height-img.height*s,py));
+  if(type==='bandeau'){ctx.fillStyle='#0b0418';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,px,py,img.width*s,img.height*s)}
+  else{ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(img,px,py,img.width*s,img.height*s);if($('punch').checked){ctx.save();ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(cv.width/2,cv.height/2,cv.width*.3,0,Math.PI*2);ctx.fill();ctx.restore()}}
+  if(type==='bandeau'){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const u='url('+cv.toDataURL('image/jpeg',.5)+')';['pv1','pv2','pv3'].forEach(i=>$(i).style.backgroundImage=u);$('hmHost').querySelector('.hmbg').style.backgroundImage=u;$('rwHost').querySelector('.rwbg').style.backgroundImage=u})}
+  $('save').disabled=!$('name').value.trim();
+}
+$('choose').onclick=()=>$('file').click();
+$('file').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(!f.type.startsWith('image/')){say('msg','Choisis un fichier image.',1);return}
+  const r=new FileReader();
+  r.onload=()=>{const i=new Image();
+    i.onload=()=>{img=i;fname=f.name;zoom=1;$('zoom').value=1;const s=base();px=(cv.width-i.width*s)/2;py=(cv.height-i.height*s)/2;
+      $('ctrl').hidden=false;say('msg','');showPrev();draw()};
+    i.onerror=()=>say('msg','Image illisible.',1);i.src=r.result};
+  r.readAsDataURL(f);
+};
+$('zoom').oninput=e=>{
+  if(!img)return;
+  const o=base()*zoom,cx=(cv.width/2-px)/o,cy=(cv.height/2-py)/o;
+  zoom=parseFloat(e.target.value);const s=base()*zoom;px=cv.width/2-cx*s;py=cv.height/2-cy*s;draw();
+};
+let drag=null;const pv=$('prev');
+pv.addEventListener('pointerdown',e=>{if(!img)return;drag={x:e.clientX,y:e.clientY,px,py};pv.setPointerCapture(e.pointerId)});
+pv.addEventListener('pointermove',e=>{if(!drag)return;const k=cv.width/pv.clientWidth;px=drag.px+(e.clientX-drag.x)*k;py=drag.py+(e.clientY-drag.y)*k;draw()});
+['pointerup','pointercancel'].forEach(t=>pv.addEventListener(t,()=>{drag=null}));
+$('name').oninput=()=>{$('save').disabled=!(img&&$('name').value.trim())};
+$('punch').onchange=draw;
+
+function mkId(n){
+  let b=n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'item',id=b,k=2;
+  while(all.some(x=>x.id===id))id=b+'-'+(k++);
+  return id;
+}
+async function loadBanners(){
+  const {data,error}=await sb.rpc('vyro_admin_banners');
+  if(error){say('msg',emsg(error),1);return}
+  all=(data||[]).map(b=>({id:b.id,type:'bandeau',name:b.name,price:b.price,active:b.active,width:1260,height:540,image:b.img_url||'',owners:Number(b.owners)||0}));
+  renderList();showPrev();
+}
+async function upd(b,patch){
+  const x=Object.assign({name:b.name,price:b.price,active:b.active},patch);
+  const {error}=await sb.rpc('vyro_admin_banner_save',{p_id:b.id,p_name:x.name,p_price:x.price,p_img:null,p_active:x.active});
+  if(error){say('msg',emsg(error),1);return false}
+  await loadBanners();return true;
+}
+$('save').onclick=async()=>{
+  const name=$('name').value.trim(),price=Math.max(0,parseInt($('price').value,10)||0),c=CFG[type];
+  if(!img||!name)return;
+  const bt=$('save');bt.disabled=true;say('msg','Envoi vers la boutique…');
+  let path='';
+  try{
+    const blob=await new Promise(r=>cv.toBlob(r,c.mime,c.q));
+    if(!blob)throw new Error('Image illisible');
+    if(blob.size>2*1024*1024)throw new Error('size');
+    const id=mkId(name);path=id+'-'+Date.now().toString(36)+'.'+c.ext;
+    const up=await sb.storage.from('vyro-banners').upload(path,blob,{contentType:c.mime,cacheControl:'31536000'});
+    if(up.error)throw up.error;
+    const url=SB_URL+'/storage/v1/object/public/vyro-banners/'+path;
+    const {error}=await sb.rpc('vyro_admin_banner_save',{p_id:id,p_name:name,p_price:price,p_img:url,p_active:true});
+    if(error){try{await sb.storage.from('vyro-banners').remove([path])}catch(x){}throw error}
+    discard();await loadBanners();say('msg','Bandeau publié dans la boutique ✅');
+  }catch(e){say('msg',emsg(e),1);bt.disabled=false}
+};
+async function delBn(b){
+  const {data,error}=await sb.rpc('vyro_admin_banner_delete',{p_id:b.id});
+  if(error){say('msg',emsg(error),1);return}
+  if(data&&data.result==='deleted'&&data.img){const p=String(data.img).split('/vyro-banners/')[1];if(p)try{await sb.storage.from('vyro-banners').remove([decodeURIComponent(p)])}catch(x){}say('msg','Supprimé.')}
+  else say('msg','Déjà utilisé par des membres ou intégré à l’appli : masqué de la boutique.');
+  await loadBanners();
+}
+$('rm').onclick=()=>{
+  if(img){discard();return}
+  const cur=current();if(!cur)return;
+  if(confirm('Supprimer « '+cur.name+' » ?'))delBn(cur);
+};
+function renderList(){
+  const items=all.filter(b=>b.type===type);
+  $('count').textContent=items.length;
+  $('list').innerHTML=items.length?items.map(b=>
+   '<div class="item '+type+(b.active?'':' off')+'"><div class="im">'+(b.image?'<img data-pb="'+esc(b.id)+'" style="cursor:pointer" src="'+esc(b.image)+'" alt="'+esc(b.name)+'" loading="lazy">':'<div class="ph" style="padding:22px 6px;font-size:.78rem">Dessin intégré à l’appli</div>')+'</div>'+
+   '<div class="t"><b>'+esc(b.name)+'</b><br><span>'+(b.price>0?num(b.price)+' BeeCoins':'Gratuit')+'</span>'+(b.active?'':' · masqué')+(b.owners?' · '+b.owners+' membre'+(b.owners>1?'s':''):'')+'</div>'+
+   '<div class="a"><button class="btn sm" data-a="price" data-id="'+esc(b.id)+'">Prix</button>'+
+   '<button class="btn sm" data-a="toggle" data-id="'+esc(b.id)+'">'+(b.active?'Masquer':'Afficher')+'</button>'+
+   (b.image?'<button class="btn sm del" data-a="del" data-id="'+esc(b.id)+'">Supprimer</button>':'')+'</div></div>').join('')
+   :'<div class="note" style="grid-column:1/-1;text-align:center">Rien pour l’instant.</div>';
+  if(!img)showPrev();
+}
+$('list').onclick=async e=>{
+  if(e.target.dataset.pb){openBn(e.target.dataset.pb);return}
+  const a=e.target.dataset.a,id=e.target.dataset.id;if(!a)return;
+  const b=all.find(x=>x.id===id);if(!b)return;
+  if(a==='price'){const v=prompt('Nouveau prix en BeeCoins pour « '+b.name+' » :',b.price);if(v===null)return;await upd(b,{price:Math.max(0,parseInt(v,10)||0)})}
+  else if(a==='toggle')await upd(b,{active:!b.active});
+  else{if(!confirm('Supprimer « '+b.name+' » définitivement ?'))return;await delBn(b)}
+};
+
+/* ---------- Connexion ---------- */
+function lock(on,msg){document.body.classList.toggle('lock',on);if(msg!==undefined){$('lmsg').textContent=msg}}
+async function enterAdmin(session){
+  const {data,error}=await sb.rpc('vyro_is_admin');
+  if(error||!data){await sb.auth.signOut();admin=null;lock(true,'Ce compte n’est pas administrateur VYRO.');return false}
+  admin=session.user;lock(false,'');go('dash');return true;
+}
+$('lf').onsubmit=async e=>{
+  e.preventDefault();$('lmsg').textContent='Connexion…';
+  const {data,error}=await sb.auth.signInWithPassword({email:$('lem').value.trim(),password:$('lpw').value});
+  if(error){$('lmsg').textContent=/invalid/i.test(error.message)?'Email ou mot de passe incorrect.':'Connexion impossible : '+error.message;return}
+  $('lpw').value='';await enterAdmin(data.session);
+};
+$('logout').onclick=async()=>{await sb.auth.signOut();admin=null;$('set').hidden=true;lock(true,'')};
+$('refresh').onclick=()=>{$('set').hidden=true;go(page)};
+async function boot(){
+  const {data}=await sb.auth.getSession();
+  if(data&&data.session)await enterAdmin(data.session);else lock(true,'');
+}
+$('hmHost').innerHTML=homeMock('');$('rwHost').innerHTML=rowMock('');
+boot();
+</script>
+</body>
+</html>
